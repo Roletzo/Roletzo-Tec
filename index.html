@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RGT - Real IT Solution</title>
+    <link rel="stylesheet" href="cart.css">
+    <!-- Firebase SDK (Compat Versions) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <!-- Add styles from home.html -->
+    <style>
+        /* Your existing CSS styles from home.html */
+        .product-container {
+            width: 95%;
+            margin: 0 auto;
+            margin-top: 5px;
+            padding-left: 10px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.4rem;
+            color: #3b3636;
+        }
+
+        .product-grid {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+        }
+
+        .product-card {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            flex: 0 0 calc(25% - 10px);
+            width: calc(25% - 10px); /* 4 items per row on desktop */
+            display: flex;
+            flex-direction: column;
+            min-height: 300px; /* Default height for desktop */
+            cursor: pointer;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-image-container {
+            width: 100%;
+            height: 190px; /* Fixed height for the image container */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background-color: #f9f9f9;
+            position: relative; /* For loading spinner */
+        }
+
+        .product-image {
+            width: 100%;
+            height: 100%;
+            max-height: 190px; /* Ensures the image doesn't exceed the container */
+            object-fit: contain;
+            display: block; /* Prevents inline default spacing */
+            transition: opacity 0.3s ease;
+        }
+
+
+        .product-image.loaded {
+            opacity: 1; /* Show image when it's loaded */
+        }
+
+        .loading-spinner {
+            position: absolute;
+            top: 60%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .product-info {
+            padding: 15px;
+            text-align: center;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .product-name {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: #222;
+        }
+
+        .product-price {
+            font-size: 1.1rem;
+            color: #e67e22;
+            margin-bottom: 15px;
+        }
+
+        .add-to-cart {
+            background-color: #363636;
+            color: #fff;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+            width: 100%;
+        }
+
+        .add-to-cart:hover {
+            background-color: #ff0000;
+        }
+
+        @media (max-width: 1200px) {
+            .product-card {
+                flex: 1 1 calc(33.33% - 10px); /* 3 cards per row on smaller desktops */
+                max-width: calc(33.33% - 10px);
+            }
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .product-card {
+                flex: 1 1 calc(50% - 10px); /* 2 cards per row on tablets */
+                max-width: calc(50% - 10px);
+            }
+
+            .product-image-container {
+                height: 200px; /* Reduce image container height for tablets */
+            }
+
+            .add-to-cart {
+                padding: 10px 15px; /* Smaller padding for tablets */
+            }
+
+            .loading-spinner {
+            position: absolute;
+            top: 80%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .loading-spinner {
+            position: absolute;
+            top: 90%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            }
+            .product-card {
+                flex: 1 1 calc(50% - 10px); /* 1 card per row on mobile */
+                max-width: calc(50% - 10px);
+            }
+
+            .product-image-container {
+                height: 150px; /* Reduce image container height for mobile */
+            }
+
+            .product-name {
+                font-size: 1rem; /* Smaller font size for mobile */
+            }
+
+            .product-price {
+                font-size: 0.9rem; /* Smaller font size for mobile */
+            }
+
+            .add-to-cart {
+                padding: 8px 12px; /* Smaller padding for mobile */
+                font-size: 0.9rem; /* Smaller font size for mobile */
+            }
+        }
+
+        .loading-spinner {
+            position: absolute;
+            top: 60%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #ff0000;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <p style="display: flex; align-items: center; gap: 8px;">
+            <img src="assets/icons/email.png" alt="Email Icon" width="16" height="16" 
+            style="filter: grayscale(100%) brightness(50%) contrast(100%);">
+            <span style="color: black;">rolekzotrading@gmail.com</span>
+        </p>
+        <p style="display: flex; align-items: center; gap: 8px;">
+            <img src="assets/icons/telephone-symbol-button.png" alt="Email Icon" width="15" height="15" 
+            style="filter: grayscale(100%) brightness(50%) contrast(100%);">
+            <span style="color: black;">+27 76 309 9830</span>
+        </p>
+        <div class="legal-links">
+            <a href="terms-and-conditions.html" style="color: rgb(67, 184, 67); text-decoration: none;">Terms and Conditions</a>
+            <span style="color: black; margin: 0 8px;">|</span>
+            <span style="color: black;">© 2025 Rolekzo Trading. All Rights Reserved.</span>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <div class="header">
+        <div class="navbar">
+            <img id="logo" src="assets/logo/RGT.jpg" alt="Logo" class="logo" width="120" height="70">
+            <ul>
+                <li><a href="#home" data-target="content-home">Home</a></li>
+                <li><a href="#sell" data-target="content-sell">Sell</a></li>
+                <li><a href="#contact" data-target="content-contact">Contact</a></li>
+            </ul>
+        </div>
+        <div class="navbar-b" id="navbar-b">
+            <button class="location-btn" id="locationButton">
+                <span class="location-text">Thohoyandou Luvhego Complex Office 1</span>
+                <img src="assets/icons/location.png" alt="location">
+            </button>
+            <div class="cart">
+                <img src="assets/icons/grocery-store.png" alt="Cart Icon" class="cart-icon">
+                <p>0</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cart Drawer -->
+    <div class="cart-drawer">
+        <button class="close-btn">&times;</button>
+        <h2></h2>
+        <div class="cart-items">
+            <!-- Cart items will be dynamically inserted here -->
+        </div>
+        <div class="empty-cart">
+            <img src="assets/icons/empty-cart.png" alt="Empty Cart">
+            <p>Cart is empty.</p>
+        </div>
+        <div class="cart-total">Total: R<span id="cart-total">0.00</span></div>
+        <button class="proceed-to-checkout">Proceed to Checkout</button>
+    </div>
+
+    <!-- Overlay for background dimming -->
+    <div class="overlay"></div>
+
+    <!-- Content Placeholder -->
+    <div class="container">
+        <div id="root"></div>
+        <div id="content-placeholder">
+            <!-- Sections are always present in the DOM -->
+            <div id="content-home" class="content-section"></div>
+            <div id="content-sell" class="content-section" style="display: none;"></div>
+            <div id="content-contact" class="content-section" style="display: none;"></div>
+        </div>
+    </div>
+
+    
+
+    <!-- Firebase Initialization -->
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDikaZOvMYWWqjju_Izzlt_w-s7vsaW3Ag",
+            authDomain: "rgt-technical-support.firebaseapp.com",
+            projectId: "rgt-technical-support",
+            storageBucket: "rgt-technical-support.appspot.com",
+            messagingSenderId: "717513573179",
+            appId: "1:717513573179:web:2522958965e5166585ed1e",
+            measurementId: "G-0RCYY15LHD"
+        };
+
+        // Initialize Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.firestore();
+    </script>
+
+    <!-- Link to the external JavaScript file -->
+    <script src="home.js"></script>
+
+    <!-- Location Button Script -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.getElementById("locationButton").addEventListener("click", function () {
+                const latitude = -22.97454; // Replace with actual latitude
+                const longitude = 30.45949; // Replace with actual longitude
+                window.open(`https://www.google.com/maps?q=${latitude},${longitude}`, '_blank');
+            });
+        });
+    </script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+    const logo = document.getElementById('logo');
+
+    logo.addEventListener('click', function () {
+        const user = firebase.auth().currentUser;
+
+        if (user) {
+            // User is already logged in
+            console.log('User is already logged in:', user.email);
+
+            // Check if the user is an admin
+            const userUid = user.uid;
+            const userRef = db.collection('users').doc(userUid);
+
+            userRef.get().then((doc) => {
+                if (doc.exists) {
+                    const userData = doc.data();
+                    if (userData.role === 'admin') {
+                        window.location.href = 'admin.html'; // or 'admin.php'
+                    } else {
+                        console.log('User is not an admin.');
+                    }
+                } else {
+                    console.log('No such document!');
+                }
+            }).catch((error) => {
+                console.log('Error getting document:', error);
+            });
+        } else {
+            // User is not logged in, attempt to log them in
+            console.log('User is not logged in. Attempting to log in...');
+
+            // Example: Redirect to a login page or trigger a login popup
+            // Replace with your login page URL
+
+            // Alternatively, you can use Firebase Authentication methods to log the user in programmatically
+            // Example: Sign in with email/password
+            /*
+            const email = 'user@example.com'; // Replace with the user's email
+            const password = 'password123'; // Replace with the user's password
+
+            firebase.auth().signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    const user = userCredential.user;
+                    console.log('User logged in:', user.email);
+
+                    // After login, check if the user is an admin
+                    const userUid = user.uid;
+                    const userRef = db.collection('users').doc(userUid);
+
+                    userRef.get().then((doc) => {
+                        if (doc.exists) {
+                            const userData = doc.data();
+                            if (userData.role === 'admin') {
+                                window.location.href = 'admin.html'; // or 'admin.php'
+                            } else {
+                                console.log('User is not an admin.');
+                            }
+                        } else {
+                            console.log('No such document!');
+                        }
+                    }).catch((error) => {
+                        console.log('Error getting document:', error);
+                    });
+                })
+                .catch((error) => {
+                    console.log('Login error:', error.message);
+                });
+            */
+        }
+    });
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Details</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f9f9f9;
+    }
+
+    .product-details-container {
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .product-details {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .product-image {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+    }
+
+    .product-info {
+      text-align: center;
+    }
+
+    .product-name {
+      font-size: 2rem;
+      color: #222;
+      margin-bottom: 10px;
+    }
+
+    .product-price {
+      font-size: 1.5rem;
+      color: #e67e22;
+      margin-bottom: 20px;
+    }
+
+    .product-description {
+      font-size: 1rem;
+      color: #555;
+      line-height: 1.6;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .back-button {
+      background-color: #363636;
+      color: #fff;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.3s ease;
+      margin-top: 20px;
+    }
+
+    .back-button:hover {
+      background-color: #ff0000;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+      .product-name {
+        font-size: 1.5rem;
+      }
+
+      .product-price {
+        font-size: 1.2rem;
+      }
+
+      .product-description {
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="product-details-container">
+    <div class="product-details">
+      <img src="" alt="Product Image" class="product-image" id="product-image">
+      <div class="product-info">
+        <h1 class="product-name" id="product-name">Product Name</h1>
+        <p class="product-price" id="product-price">$0.00</p>
+        <p class="product-description" id="product-description">Product description goes here.</p>
+      </div>
+      <button class="back-button" onclick="window.history.back()">Back to Products</button>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const urlParams = new URLSearchParams(window.location.search);
+      const productId = urlParams.get('id');
+
+      // Fetch product details based on the ID
+      const product = getProductDetails(productId);
+
+      // Update the DOM with product details
+      if (product) {
+        document.getElementById('product-image').src = product.image;
+        document.getElementById('product-name').textContent = product.name;
+        document.getElementById('product-price').textContent = `$${product.price}`;
+        document.getElementById('product-description').textContent = product.description;
+      }
+    });
+
+    function getProductDetails(productId) {
+      // Mock product data (replace with actual data fetching logic)
+      const products = {
+        1: { name: 'Product 1', price: 19.99, image: 'https://via.placeholder.com/400', description: 'This is a detailed description of Product 1.' },
+        2: { name: 'Product 2', price: 29.99, image: 'https://via.placeholder.com/400', description: 'This is a detailed description of Product 2.' },
+        3: { name: 'Product 3', price: 39.99, image: 'https://via.placeholder.com/400', description: 'This is a detailed description of Product 3.' },
+        4: { name: 'Product 4', price: 49.99, image: 'https://via.placeholder.com/400', description: 'This is a detailed description of Product 4.' },
+        5: { name: 'Product 5', price: 59.99, image: 'https://via.placeholder.com/400', description: 'This is a detailed description of Product 5.' },
+        6: { name: 'Product 6', price: 69.99, image: 'https://via.placeholder.com/400', description: 'This is a detailed description of Product 6.' },
+      };
+
+      return products[productId];
+    }
+  </script>
+</body>
+</html>

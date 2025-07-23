@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+   /* General Styles */
+body {
+  font-family: 'Arial', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f4f9;
+  color: #333;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.image-section {
+  width: 100%;
+  text-align: center;
+}
+
+.instruction-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.instructions-section {
+  width: 100%;
+  margin-top: 20px;
+}
+
+.instruction-title {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  color: #2c3e50;
+}
+
+.instruction-steps {
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 20px;
+  padding-left: 20px;
+}
+
+.instruction-steps li {
+  margin-bottom: 10px;
+}
+
+.continue-button {
+  background-color: #d44545;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  font-size: 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.continue-button:hover {
+  background-color: #ff0000;
+}
+
+/* Responsive Styles */
+@media (min-width: 600px) {
+  .container {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 40px;
+  }
+
+  .image-section {
+    width: 50%;
+    margin-right: 20px;
+  }
+
+  .instructions-section {
+    width: 50%;
+    margin-top: 0;
+  }
+}
+
+@media (min-width: 900px) {
+  .instruction-title {
+    font-size: 2.5rem;
+  }
+
+  .instruction-steps {
+    font-size: 1.1rem;
+  }
+
+  .continue-button {
+    font-size: 1.1rem;
+    padding: 15px 30px;
+  }
+}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="image-section">
+      <img src="assets/icons/tradein.png" alt="Instruction Image" class="instruction-image"
+      width="200" height="200">
+    </div>
+    <div class="instructions-section">
+      <h1 class="instruction-title">Trade In For Cash</h1>
+      <ol class="instruction-steps">
+        <li>Step 1: Contact Number</li>
+        <li>Step 2: Product Name</li>
+        <li>Step 3: Product Description</li>
+        <li>Step 4: Is your product New or Pre-owned</li>
+        <li>Step 5: Location of your Product</li>
+        <li>Step 6: Images of your Product</li>
+      </ol>
+      <button class="continue-button" onclick="window.location.href='sell-details.html'">Continue</button>
+    </div>
+  </div>
+</body>
+</html>

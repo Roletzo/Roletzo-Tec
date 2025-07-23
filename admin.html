@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Product</title>
+  <style>
+    /* CSS Styling */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 400px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: bold;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="file"] {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+
+    button {
+      width: 100%;
+      padding: 0.75rem;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    #message {
+      margin-top: 1rem;
+      text-align: center;
+      color: #d9534f;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Add Product</h1>
+    <form id="productForm">
+      <div class="form-group">
+        <label for="productName">Product Name</label>
+        <input type="text" id="productName" placeholder="Enter product name" required>
+      </div>
+      <div class="form-group">
+        <label for="productPrice">Product Price</label>
+        <input type="number" id="productPrice" placeholder="Enter product price" required>
+      </div>
+      <div class="form-group">
+        <label for="productImage">Product Image</label>
+        <input type="file" id="productImage" accept="image/*" required>
+      </div>
+      <button type="submit">Add Product</button>
+    </form>
+    <div id="message"></div>
+  </div>
+
+  <script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-storage.js";
+
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyDikaZOvMYWWqjju_Izzlt_w-s7vsaW3Ag",
+      authDomain: "rgt-technical-support.firebaseapp.com",
+      projectId: "rgt-technical-support",
+      storageBucket: "rgt-technical-support.firebasestorage.app",
+      messagingSenderId: "717513573179",
+      appId: "1:717513573179:web:2522958965e5166585ed1e",
+      measurementId: "G-0RCYY15LHD"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+
+    // DOM Elements
+    const productForm = document.getElementById('productForm');
+    const productName = document.getElementById('productName');
+    const productPrice = document.getElementById('productPrice');
+    const productImage = document.getElementById('productImage');
+    const message = document.getElementById('message');
+
+    // Handle Form Submission
+    productForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const name = productName.value;
+      const price = parseFloat(productPrice.value);
+      const imageFile = productImage.files[0];
+
+      if (!name || !price || !imageFile) {
+        showMessage('Please fill all fields.', 'error');
+        return;
+      }
+
+      try {
+        // Upload image to Firebase Storage
+        const storageRef = ref(storage, `product_images/${imageFile.name}`);
+        const snapshot = await uploadBytes(storageRef, imageFile);
+        const imageUrl = await getDownloadURL(snapshot.ref);
+
+        // Save product details to Firestore
+        await addDoc(collection(db, 'Products'), {
+          name: name,
+          price: price,
+          imageUrl: imageUrl
+        });
+
+        showMessage('Product added successfully!', 'success');
+        productForm.reset();
+      } catch (error) {
+        console.error('Error adding product: ', error);
+        showMessage('Failed to add product. Please try again.', 'error');
+      }
+    });
+
+    // Show feedback message
+    function showMessage(msg, type) {
+      message.textContent = msg;
+      message.style.color = type === 'success' ? '#28a745' : '#d9534f';
+    }
+  </script>
+</body>
+</html>
